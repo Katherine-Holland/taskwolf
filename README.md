@@ -82,3 +82,8 @@ const top100 = timestamps.filter(...).slice(0, 100); // ❌ don’t do this
 
 ### ✅ Final Thoughts
 Breaking the task into three parts really helped me understand how to work with Playwright. I learned how to navigate pages, deal with pagination, clean up weird timestamp formats, and write solid validation logic. Each script builds on the last, and the final version (index.js) brings it all together into one polished solution.
+
+To test:
+
+run: node index.js
+run: node index.js --debug
