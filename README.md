@@ -1,16 +1,15 @@
-# taskwolf
+# Task Wolf
 Article Sorter
-*Notes*
 
 ## 🧪 Testing & What I Learned Along the Way
 
-To make sure I really understood the task, I broke it down into smaller pieces and created three test scripts: one for scraping, one for pagination, and one for validation. Here’s what happened as I worked through each part — including the bugs I hit and how I fixed them.
+Taking a methodological approach, I broke the task down into smaller pieces and created three test scripts: one for scraping, one for pagination, and one for validation. Here’s what happened as I worked through each part — including the bugs I hit and how I fixed them.
 
 ---
 
 ### `01_basic_scrape.js` — Getting Started with Scraping
 
-First, I wanted to make sure I could even grab data from Hacker News using Playwright. So I wrote a quick script that opened the site, selected all the article title links, and printed out the first 10.
+First, I wanted to make sure I could grab data from Hacker News using Playwright. So I wrote a quick script that opened the site, selected all the article title links, and printed out the first 10.
 
 This part went smoothly — Playwright’s `page.$$eval()` made it easy to grab the text from `.titleline > a`. No issues here!
 
@@ -18,7 +17,7 @@ This part went smoothly — Playwright’s `page.$$eval()` made it easy to grab 
 
 ### `02_pagination.js` — Clicking “More” to Collect 100 Posts
 
-The next step was to collect more than just the first 30 posts. Hacker News loads new articles when you click the “More” button at the bottom, so I set up a loop to click that and grab titles from the next page too.
+The next step was to collect more than just the first 30 posts. Hacker News loads new articles when you click the “More” button at the bottom, so I set up a loop to click that button and grab titles from the next page too.
 
 Originally, I tried using:
 ```js
@@ -31,16 +30,16 @@ await Promise.all([
 await page.click('a.morelink');
 await page.waitForLoadState('load');
 
-and that worked perfectly!
+and that worked perfectly.
 
 I also noticed that sometimes I collected more than 100 posts, so I made sure to only use:
 const top100 = titles.slice(0, 100);
-in my final validation logic — just to stick to the brief.
+to slice the array in my final validation logic — just to stick to the brief.
 
 ### '03_validation.js' — Timestamps & Sorting
 This part was trickier. I needed to make sure the first 100 posts were sorted from newest to oldest — based on their timestamp.
 
-So I grabbed the title attribute from each <span class="age">, which contains the full ISO timestamp. Or so I thought.
+So I grabbed the title attribute from each <span class="age">, which contains the full ISO timestamp. Or so I thought...
 
 Here’s what I actually got:
 
@@ -50,7 +49,7 @@ Turns out Hacker News includes an extra number after the timestamp, and that was
 
 I hit this error:
 
-RangeError: Invalid time value
+RangeError: Invalid time value (that classic!)
 
 To fix it, I updated the code to split off the extra bit:
 
@@ -78,10 +77,10 @@ const dates = top100
 
 And not like this:
 
-const top100 = timestamps.filter(...).slice(0, 100); // ❌ don’t do this
+const top100 = timestamps.filter(...).slice(0, 100);
 
 ### ✅ Final Thoughts
-Breaking the task into three parts really helped me understand how to work with Playwright. I learned how to navigate pages, deal with pagination, clean up weird timestamp formats, and write solid validation logic. Each script builds on the last, and the final version (index.js) brings it all together into one polished solution.
+Breaking the task into three parts really helped me to ensure my results were accurate. I navigated pages, dealt with pagination, cleaned up weird timestamp formats, and wrote solid validation logic. Each script builds on the last, and the final version (index.js) brings it all together into one polished solution.
 
 To test:
 
