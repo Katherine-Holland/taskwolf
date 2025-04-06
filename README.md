@@ -139,6 +139,12 @@ To install and run the project:
    ```bash
    node index.js --debug
    ```
+   This will output each timestamp alongside the article title it belongs to, making it easy to visually inspect the sort order:
+      ```
+      1. 2025-04-06T13:36:41.000Z — "Ask HN: What are your favorite productivity hacks?"
+      2. 2025-04-06T13:28:48.000Z — "Show HN: I built a local-first notes app"
+      ...
+      ```
 
 ---
 

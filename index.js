@@ -12,6 +12,7 @@ async function sortHackerNewsArticles() {
   await page.goto("https://news.ycombinator.com/newest");
 
   const timestamps = [];
+  const titles = [];
 
   // Step 1: Click “More” until we collect at least 100 post timestamps
   while (timestamps.length < 100) {
@@ -19,9 +20,17 @@ async function sortHackerNewsArticles() {
       spans.map(span => span.getAttribute("title"))
     );
 
-    for (const ts of newTimestamps) {
+    const newTitles = await page.$$eval(".titleline > a", links =>
+      links.map(link => link.innerText)
+    );
+
+    for (let i = 0; i < newTimestamps.length; i++) {
+      const ts = newTimestamps[i];
+      const title = newTitles[i];
+
       if (ts && !timestamps.includes(ts)) {
         timestamps.push(ts);
+        titles.push(title);
       }
     }
 
@@ -33,15 +42,16 @@ async function sortHackerNewsArticles() {
     }
   }
 
-  // Step 2: Work only with the first 100 entries (as required)
+  // Step 2: Work only with the first 100 entries
   const top100 = timestamps.slice(0, 100);
+  const top100Titles = titles.slice(0, 100);
 
   // Step 3: Clean and convert to Date objects
   const dates = top100
     .filter(ts => ts && !isNaN(new Date(ts.split(" ")[0])))
     .map(ts => new Date(ts.split(" ")[0]));
 
-  // Step 4: Validate that dates are sorted from newest to oldest
+  // Step 4: Validate sort order
   console.log('\n🧪 Checking timestamp sort order for the first 100 posts...\n');
 
   const isSorted = dates.every((date, i, arr) => i === 0 || arr[i - 1] >= date);
@@ -60,19 +70,19 @@ async function sortHackerNewsArticles() {
     console.log(`${i + 1}. ${date.toISOString()}`);
   });
 
-  // Step 6 (Bonus): Show time difference between top posts
+  // Step 6: Show time difference between first few posts
   console.log("\n🔍 Time difference between first few posts:");
   for (let i = 1; i < 5; i++) {
     const diff = (dates[i - 1] - dates[i]) / 1000;
     console.log(`Post ${i} to ${i + 1}: ${diff}s difference`);
   }
 
-  // Optional: Debug mode to print all timestamps if "--debug" is passed
+  // Step 7: Optional debug output with titles
   if (process.argv.includes('--debug')) {
-    console.log("\n📋 Full list of timestamps:");
-    dates.forEach((date, i) => {
-      console.log(`${i + 1}. ${date.toISOString()}`);
-    });
+    console.log("\n📋 Full list of articles with timestamps:");
+    for (let i = 0; i < dates.length; i++) {
+      console.log(`${i + 1}. ${dates[i].toISOString()} — "${top100Titles[i]}"`);
+    }
   }
 
   await browser.close();
@@ -84,3 +94,4 @@ async function sortHackerNewsArticles() {
 (async () => {
   await sortHackerNewsArticles();
 })();
+
